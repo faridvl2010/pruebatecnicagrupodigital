@@ -80,23 +80,23 @@ export default function LiquidacionForm() {
       ${completed || step === num ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600"}
     `;
   };// Función para enviar datos (último paso)
-const handleSubmit = (e) => {
-  e.preventDefault();
-  console.log("Formulario enviado:", formData);
-  // POST a backend
-};
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Formulario enviado:", formData);
+    // POST a backend
+  };
 
-// Función para consultar (si tienes un botón de consulta en un paso específico)
-const handleConsultar = () => {
-  console.log("Consultar datos con:", formData);
-  // GET/POST 
-};
+  // Función para consultar (si tienes un botón de consulta en un paso específico)
+  const handleConsultar = () => {
+    console.log("Consultar datos con:", formData);
+    // GET/POST 
+  };
 
-const handleContinuar = () => {
-  if (step < 4) { // ajusta según pasos 
-    setStep(step + 1);
-  }
-};
+  const handleContinuar = () => {
+    if (step < 4) { // ajusta según pasos 
+      setStep(step + 1);
+    }
+  };
 
   const metodoPagoBtn = (value, label) => (
     <button
@@ -195,29 +195,32 @@ const handleContinuar = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col gap-2">
           <div className="text-xs text-gray-600">Forma de pago:</div>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="formaPago"
-              value="Contado"
-              checked={formData.formaPago === "Contado"}
-              onChange={handleChange}
-            />
-            <span>Contado</span>
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="formaPago"
-              value="Tío Paco"
-              checked={formData.formaPago === "Tío Paco"}
-              onChange={handleChange}
-            />
-            <span>Tío Paco</span>
-          </label>
 
+          <div className="flex items-center gap-6">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="formaPago"
+                value="Contado"
+                checked={formData.formaPago === "Contado"}
+                onChange={handleChange}
+              />
+              <span>Contado</span>
+            </label>
+
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="formaPago"
+                value="Tío Paco"
+                checked={formData.formaPago === "Tío Paco"}
+                onChange={handleChange}
+              />
+              <span>Tío Paco</span>
+            </label>
+          </div>
           <button
             type="button"
             onClick={handleConsultar}
@@ -226,6 +229,8 @@ const handleContinuar = () => {
             Consultar
           </button>
         </div>
+
+
       </section>
 
       {/* Liquidación */}
