@@ -2,15 +2,12 @@ import { useMemo, useState } from "react";
 
 export default function LiquidacionForm() {
   const initial = {
-    // Información general
     placa: "Placa",
     confirmacionPlaca: "Confirmacion placa",
     tipoServicio: "Particular",
     modelo: "Modelos 123",
     tipoTramite: "Revisión TM",
     formaPago: "Contado",
-
-    // Cliente
     tipoDoc: "CC",
     numeroDoc: "",
     nombres: "",
@@ -18,19 +15,39 @@ export default function LiquidacionForm() {
     direccion: "",
     telefono: "",
     correo: "",
-
-    // Método de pago final
     metodoPago: "PSE",
   };
 
   const [formData, setFormData] = useState(initial);
+  const [step, setStep] = useState(1); // 👈 Te faltaba step aquí
+
+  const placaRegex = /^[A-Z]{3}\d{2}[A-Z0-9]$/;
+  const emailRegex = /^\S+@\S+\.\S+$/;
+
+  // 🔹 Define las funciones que faltaban:
+  const isStep1Complete = () => {
+    const p = (formData.placa || "").toUpperCase().trim();
+    const c = (formData.confirmacionPlaca || "").toUpperCase().trim();
+    return placaRegex.test(p) && p === c;
+  };
+
+  const isStep2Complete = () => {
+    return (
+      formData.tipoDoc &&
+      (formData.numeroDoc || "").trim() &&
+      (formData.nombres || "").trim() &&
+      (formData.apellidos || "").trim() &&
+      (formData.direccion || "").trim() &&
+      (formData.telefono || "").trim() &&
+      emailRegex.test(formData.correo || "")
+    );
+  };
 
   const formatCOP = useMemo(
     () => new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP" }),
     []
   );
 
-  // Valores de liquidación (mock para mostrar el cuadro a la derecha)
   const valores = {
     ANSV: 7000,
     Recaudo: 1.0591,
@@ -44,42 +61,42 @@ export default function LiquidacionForm() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((s) => ({ ...s, [name]: value }));
-  };
 
-  const handleConsultar = () => {
-    console.log("CONSULTAR =>", {
-      tipoServicio: formData.tipoServicio,
-      modelo: formData.modelo,
-      tipoTramite: formData.tipoTramite,
-      formaPago: formData.formaPago,
-    });
-  };
-
-  const handleContinuar = () => {
-    console.log("CONTINUAR =>", {
-      cliente: {
-        tipoDoc: formData.tipoDoc,
-        numeroDoc: formData.numeroDoc,
-        nombres: formData.nombres,
-        apellidos: formData.apellidos,
-        direccion: formData.direccion,
-        telefono: formData.telefono,
-        correo: formData.correo,
-      },
-      valoresLiquidacion: valores,
-      total,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("GENERAR (payload completo) =>", formData, {
-      valoresLiquidacion: valores,
-      total,
-    });
+    // 🔹 Avanzar automáticamente de paso
+    if (step === 1 && isStep1Complete()) setStep(2);
+    if (step === 2 && isStep2Complete()) setStep(3);
   };
 
   const resetForm = () => setFormData(initial);
+
+  // 🔹 Los circulitos con número y color
+  const stepCircle = (num) => {
+    const completed =
+      (num === 1 && isStep1Complete()) ||
+      (num === 2 && isStep2Complete()) ||
+      (num < step);
+
+    return `flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold
+      ${completed || step === num ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600"}
+    `;
+  };// Función para enviar datos (último paso)
+const handleSubmit = (e) => {
+  e.preventDefault();
+  console.log("Formulario enviado:", formData);
+  // POST a backend
+};
+
+// Función para consultar (si tienes un botón de consulta en un paso específico)
+const handleConsultar = () => {
+  console.log("Consultar datos con:", formData);
+  // GET/POST 
+};
+
+const handleContinuar = () => {
+  if (step < 4) { // ajusta según pasos 
+    setStep(step + 1);
+  }
+};
 
   const metodoPagoBtn = (value, label) => (
     <button
@@ -98,8 +115,10 @@ export default function LiquidacionForm() {
       {/* Información general */}
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-gray-600 flex items-center gap-2">
-          <span className="w-2 h-2 bg-blue-600 rounded-full" /> <b>Información general</b>
+          <span className={stepCircle(1)}>1</span>
+          <b>Información general</b>
         </h2>
+
 
         <div className="grid md:grid-cols-3 gap-4">
           <div className="flex flex-col gap-1">
@@ -212,10 +231,13 @@ export default function LiquidacionForm() {
       {/* Liquidación */}
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-gray-600 flex items-center gap-2">
-          <span className="w-2 h-2 bg-blue-600 rounded-full" /><b> Liquidación</b>
+          <span className={stepCircle(2)}>2</span>
+          <b>Liquidación</b>
         </h2>
+
         <h3 className="text-sm font-semibold text-gray-600 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full" /> Información del cliente
+          <span className="w-2 h-2 bg-gray-300 rounded-full" />
+          Información del cliente
         </h3>
 
         {/* Solo 2 columnas principales */}
@@ -340,8 +362,10 @@ export default function LiquidacionForm() {
       {/* Pago */}
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-gray-600 flex items-center gap-2">
-          <span className="w-2 h-2 bg-blue-600 rounded-full" /> <b>Pago</b>
+          <span className={stepCircle(3)}>3</span>
+          <b>Pago</b>
         </h2>
+
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
