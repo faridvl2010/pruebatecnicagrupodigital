@@ -236,7 +236,6 @@ const handleContinuar = () => {
         </h2>
 
         <h3 className="text-sm font-semibold text-gray-600 flex items-center gap-2">
-          <span className="w-2 h-2 bg-gray-300 rounded-full" />
           Información del cliente
         </h3>
 
